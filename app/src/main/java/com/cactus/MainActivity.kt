@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when {
-            resultCode != Activity.RESULT_OK -> {}
-            requestCode == OpenAction.PHOTOS.requestCode -> requestPhotos()
-            requestCode == OpenAction.CAMERA.requestCode -> requestCamera()
+            data == null || resultCode != Activity.RESULT_OK -> {}
+            requestCode == OpenAction.PHOTOS.code -> navigateToDetails(data)
+            requestCode == OpenAction.CAMERA.code -> navigateToDetails(data)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -45,8 +45,8 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when {
             !allPermissionsGranted(grantResults) -> onMissingPermissions()
-            requestCode == OpenAction.PHOTOS.requestCode -> requestPhotos()
-            requestCode == OpenAction.CAMERA.requestCode -> requestCamera()
+            requestCode == OpenAction.PHOTOS.code -> requestPhotos()
+            requestCode == OpenAction.CAMERA.code -> requestCamera()
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
@@ -60,19 +60,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestCamera() {
-        permissionManager.verify(storagePermissions(), OpenAction.CAMERA.requestCode) {
+        permissionManager.verify(storagePermissions(), OpenAction.CAMERA.code) {
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileManager.createTempPicture())
-            startActivityForResult(intent, OpenAction.CAMERA.requestCode)
+            startActivityForResult(intent, OpenAction.CAMERA.code)
         }
     }
 
     private fun requestPhotos() {
-        permissionManager.verify(storagePermissions(), OpenAction.PHOTOS.requestCode) {
+        permissionManager.verify(storagePermissions(), OpenAction.PHOTOS.code) {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "file/*"
-            startActivityForResult(intent, OpenAction.PHOTOS.requestCode)
+            startActivityForResult(intent, OpenAction.PHOTOS.code)
         }
+    }
+
+    private fun navigateToDetails(photoIntent: Intent) {
+        val intent = Intent(this, DetailsActivity::class.java)
+        intent.putExtra(DetailsActivity.Arguments.URI.name, photoIntent.data)
+        startActivity(intent)
     }
 
     private fun storagePermissions() = arrayOf(
@@ -80,8 +86,8 @@ class MainActivity : AppCompatActivity() {
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
-    enum class OpenAction(val requestCode: Int) {
-        PHOTOS(requestCode = 1233),
-        CAMERA(requestCode = 1234)
+    enum class OpenAction(val code: Int) {
+        PHOTOS(code = 1233),
+        CAMERA(code = 1234)
     }
 }
