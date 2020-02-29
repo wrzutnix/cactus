@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">cactus</string>
+    <string name="app_name">Cactus</string>
     <string name="take_a_photo">take a photo</string>
     <string name="pick_from_gallery">pick from gallery</string>
+    <string name="start_over">start over</string>
+    <string name="please_wait">gimme a sec…</string>
+    <string name="check_your_cactus">check your cactus</string>
+
+    <string name="it_is_a_cactus">yeah, that\'s cactus!</string>
+    <string name="not_a_cactus">sorry mate, it is not a cactus</string>
 
     <string name="missing_cameras_error">device does not have any cameras</string>
-    <string name="missing_permissions_error">we need your permissions first</string>
+    <string name="missing_permissions_error">we need your permission bro</string>
+    <string name="cant_process_photo_error">we can not process this photo</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.cactus.util
+package com.cactus.util.permission
 
 import android.app.Activity
 import android.content.pm.PackageManager
@@ -6,8 +6,12 @@ import androidx.core.app.ActivityCompat
 
 class PermissionManager(private val activity: Activity) {
 
+    fun allGranted(grantResults: IntArray): Boolean {
+        return grantResults.filter { result -> result == PackageManager.PERMISSION_GRANTED }.size == grantResults.size
+    }
+
     fun verify(permissions: Array<String>, permissionsRequestCode: Int, onSuccessAction: () -> Unit) {
-        if (has(permissions)) onSuccessAction() else request(permissions, permissionsRequestCode);
+        if (has(permissions)) onSuccessAction() else request(permissions, permissionsRequestCode)
     }
 
     private fun has(permissions: Array<String>): Boolean {

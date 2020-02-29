@@ -1,93 +1,63 @@
 package com.cactus
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_main.*
-import android.content.pm.PackageManager
-import android.os.Environment
-import androidx.annotation.NonNull
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityCompat
-import com.cactus.util.FileManager
-import com.cactus.util.PermissionManager
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
+class MainActivity: AppCompatActivity(), MainContract.View {
 
-class MainActivity : AppCompatActivity() {
-
-    private val permissionManager = PermissionManager(activity = this)
-    private val fileManager = FileManager(context = this)
+    @Inject lateinit var presenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        photo_button.setOnClickListener { requestCamera() }
-        gallery_button.setOnClickListener { requestPhotos() }
+        photo_button.setOnClickListener { presenter.onCameraRequested() }
+        gallery_button.setOnClickListener { presenter.onPhotoGalleryRequested() }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when {
-            data == null || resultCode != Activity.RESULT_OK -> {}
-            requestCode == OpenAction.PHOTOS.code -> navigateToDetails(data)
-            requestCode == OpenAction.CAMERA.code -> navigateToDetails(data)
-            else -> super.onActivityResult(requestCode, resultCode, data)
-        }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultIntent: Intent?) = when {
+        resultIntent?.data == null || resultCode != Activity.RESULT_OK -> {}
+        requestCode == MainOpenAction.PHOTOS.code -> presenter.onPhotoSelected(resultIntent.data)
+        requestCode == MainOpenAction.CAMERA.code -> presenter.onCameraRequested()
+        else -> super.onActivityResult(requestCode, resultCode, resultIntent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when {
-            !allPermissionsGranted(grantResults) -> onMissingPermissions()
-            requestCode == OpenAction.PHOTOS.code -> requestPhotos()
-            requestCode == OpenAction.CAMERA.code -> requestCamera()
-            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) = when (requestCode) {
+        in arrayOf(MainOpenAction.PHOTOS.code, MainOpenAction.CAMERA.code) ->
+            presenter.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    private fun allPermissionsGranted(grantResults: IntArray): Boolean {
-        return grantResults.filter { result -> result == PackageManager.PERMISSION_GRANTED }.size == grantResults.size
+    override fun showErrorToast(@StringRes errorStringRes: Int) =
+        Toast.makeText(this, errorStringRes, Toast.LENGTH_LONG).show()
+
+    override fun navigateToCamera(tempPictureUri: Uri) = startActivityForResult(
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            .putExtra(MediaStore.EXTRA_OUTPUT, tempPictureUri),
+        MainOpenAction.CAMERA.code)
+
+    override fun navigateToPicturePicker() = startActivityForResult(
+        Intent(Intent.ACTION_GET_CONTENT).setType("image/*"),
+        MainOpenAction.PHOTOS.code)
+
+    override fun switchPictureToProcessingState(pictureUri: Uri) {
+        picture_background.setBackgroundColor(ContextCompat.getColor(this, android.R.color.black))
+        picture_progress.visibility = View.VISIBLE
+        image.setImageURI(pictureUri)
+        image.alpha = 0.5f
     }
 
-    private fun onMissingPermissions() {
-        Toast.makeText(this, R.string.missing_permissions_error, Toast.LENGTH_LONG).show()
-    }
-
-    private fun requestCamera() {
-        permissionManager.verify(storagePermissions(), OpenAction.CAMERA.code) {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileManager.createTempPicture())
-            startActivityForResult(intent, OpenAction.CAMERA.code)
-        }
-    }
-
-    private fun requestPhotos() {
-        permissionManager.verify(storagePermissions(), OpenAction.PHOTOS.code) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "file/*"
-            startActivityForResult(intent, OpenAction.PHOTOS.code)
-        }
-    }
-
-    private fun navigateToDetails(photoIntent: Intent) {
-        val intent = Intent(this, DetailsActivity::class.java)
-        intent.putExtra(DetailsActivity.Arguments.URI.name, photoIntent.data)
-        startActivity(intent)
-    }
-
-    private fun storagePermissions() = arrayOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
-
-    enum class OpenAction(val code: Int) {
-        PHOTOS(code = 1233),
-        CAMERA(code = 1234)
+    override fun switchPictureToProcessedState() {
+        picture_progress.visibility = View.GONE
+        image.alpha = 1.0f
     }
 }
