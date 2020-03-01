@@ -1,0 +1,5 @@
+cactus
+grass
+flower
+leaf
+tree

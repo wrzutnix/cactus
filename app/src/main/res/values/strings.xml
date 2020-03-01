@@ -6,10 +6,14 @@
     <string name="please_wait">gimme a sec…</string>
     <string name="check_your_cactus">check your cactus</string>
 
-    <string name="it_is_a_cactus">yeah, that\'s cactus!</string>
-    <string name="not_a_cactus">sorry mate, it is not a cactus</string>
+    <string name="detection_description">Detected %1$s with accuracy %2$d percent</string>
+
+    <string name="probably_cactus_summary">this might be a cactus</string>
+    <string name="surely_cactus_summary">yeah, that\'s cactus!</string>
+    <string name="not_cactus_summary">nope, it\'s not a cactus</string>
 
     <string name="missing_cameras_error">device does not have any cameras</string>
     <string name="missing_permissions_error">we need your permission bro</string>
     <string name="cant_process_photo_error">we can not process this photo</string>
+    <string name="image_processing_error">your image can\'t be processed</string>
 </resources>
