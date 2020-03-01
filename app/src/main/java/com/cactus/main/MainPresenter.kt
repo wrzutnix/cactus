@@ -41,7 +41,7 @@ class MainPresenter @Inject constructor(private val view: MainContract.View, pri
     private fun onPhotoUpdateRequested() {
         latestPictureUriSubject.value?.also { imageUri ->
             view.onPictureProcessingState(imageUri)
-            domain.fml.ratingOf(imageUri,
+            domain.ml.ratingOf(imageUri,
                 { rating -> view.onPictureProcessedState(rating) },
                 { exception -> view.onPictureErrorState(exception) })
         }
@@ -57,6 +57,6 @@ class MainPresenter @Inject constructor(private val view: MainContract.View, pri
     data class Domain @Inject constructor(
         val files: FileController,
         val permissions: PermissionController,
-        val fml: MLController
+        val ml: MLController
     )
 }

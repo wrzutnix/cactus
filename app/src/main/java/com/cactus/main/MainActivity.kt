@@ -45,12 +45,10 @@ class MainActivity: AppCompatActivity(), MainContract.View {
 
     override fun navigateToCamera(tempPictureUri: Uri) = startActivityForResult(
         Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            .putExtra(MediaStore.EXTRA_OUTPUT, tempPictureUri),
-        MainOpenAction.CAMERA.code)
+            .putExtra(MediaStore.EXTRA_OUTPUT, tempPictureUri), MainOpenAction.CAMERA.code)
 
     override fun navigateToPicturePicker() = startActivityForResult(
-        Intent(Intent.ACTION_GET_CONTENT).setType("image/*"),
-        MainOpenAction.PHOTOS.code)
+        Intent(Intent.ACTION_GET_CONTENT).setType("image/*"), MainOpenAction.PHOTOS.code)
 
     override fun onPictureProcessingState(pictureUri: Uri) {
         picture_background.setBackgroundColor(ContextCompat.getColor(this, android.R.color.black))
