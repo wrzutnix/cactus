@@ -1,6 +1,7 @@
 package com.cactus.main
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,9 +12,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.cactus.R
-import com.cactus.ml.MLController
-import com.cactus.util.file.FileController
-import com.cactus.util.permission.PermissionController
 import com.cactus.ml.MLRating
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -81,6 +79,8 @@ class MainActivity: AppCompatActivity(), MainContract.View {
 
     override fun onPictureSelectionError() =
         showErrorToast(R.string.cant_process_photo_error)
+
+    override fun context(): Context = this
 
     private fun showErrorToast(@StringRes errorStringRes: Int) =
         Toast.makeText(this, errorStringRes, Toast.LENGTH_LONG).show()

@@ -3,7 +3,7 @@ package com.cactus.ml
 import androidx.annotation.StringRes
 import com.cactus.R
 
-data class MLRating(val model: String = "", val confidence: Int = 0) {
+data class MLRating(val model: String = "none", val confidence: Int = 0) {
 
     constructor(model: String, confidence: Float): this(model, (confidence * 100).toInt())
 

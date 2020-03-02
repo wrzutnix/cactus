@@ -3,7 +3,7 @@ package com.cactus.main
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(modules = [MainModule::class])
+@Component
 interface MainComponent {
 
     @Component.Factory interface Factory {

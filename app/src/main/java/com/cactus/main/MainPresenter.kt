@@ -1,10 +1,11 @@
 package com.cactus.main
 
 import android.Manifest
+import android.app.Activity
 import android.net.Uri
+import androidx.core.content.FileProvider
 import com.cactus.ml.MLController
-import com.cactus.util.file.FileController
-import com.cactus.util.permission.PermissionController
+import com.cactus.permission.PermissionController
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
@@ -21,15 +22,14 @@ class MainPresenter @Inject constructor(private val view: MainContract.View, pri
         }
 
     override fun onCameraRequested() =
-        domain.permissions.verify(storagePermissions(), MainOpenAction.CAMERA.code) {
-            domain.files.createTempPicture()?.let { tempPictureUri ->
-                latestPictureUriSubject.onNext(tempPictureUri)
-                view.navigateToCamera(tempPictureUri)
+        domain.permissions.verify(activity(), storagePermissions(), MainOpenAction.CAMERA.code) {
+            createTempFile()
+                .let { file -> FileProvider.getUriForFile(view.context(), Authority.CACTUS.code, file) }
+                .let { tempPictureUri -> latestPictureUriSubject.onNext(tempPictureUri).also { view.navigateToCamera(tempPictureUri) }}
             }
-        }
 
     override fun onPhotoGalleryRequested() =
-        domain.permissions.verify(storagePermissions(), MainOpenAction.PHOTOS.code) {
+        domain.permissions.verify(activity(), storagePermissions(), MainOpenAction.PHOTOS.code) {
             view.navigateToPicturePicker()
         }
 
@@ -41,7 +41,8 @@ class MainPresenter @Inject constructor(private val view: MainContract.View, pri
     private fun onPhotoUpdateRequested() {
         latestPictureUriSubject.value?.also { imageUri ->
             view.onPictureProcessingState(imageUri)
-            domain.ml.ratingOf(imageUri,
+            domain.ml.ratingOf(
+                view.context(), imageUri,
                 { rating -> view.onPictureProcessedState(rating) },
                 { exception -> view.onPictureErrorState(exception) })
         }
@@ -49,14 +50,19 @@ class MainPresenter @Inject constructor(private val view: MainContract.View, pri
 
     override fun onPictureTaken() = onPhotoUpdateRequested()
 
+    private fun activity() = view as Activity
+
     private fun storagePermissions() = arrayOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE
     )
 
     data class Domain @Inject constructor(
-        val files: FileController,
         val permissions: PermissionController,
         val ml: MLController
     )
+
+    enum class Authority(val code: String) {
+        CACTUS(code = "com.cactus.provider")
+    }
 }

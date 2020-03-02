@@ -1,11 +1,13 @@
 package com.cactus.main
 
+import android.content.Context
 import android.net.Uri
 import com.cactus.ml.MLRating
 
 interface MainContract {
 
     interface View {
+        fun context(): Context
         fun navigateToCamera(tempPictureUri: Uri)
         fun navigateToPicturePicker()
         fun onPermissionNotGranted()

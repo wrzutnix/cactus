@@ -1,4 +1,4 @@
-package com.cactus
+package com.cactus.ml
 
 import com.cactus.ml.MLModel
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.cactus.matcher
+package com.cactus
 
 import android.net.Uri
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeMatcher
 
-object ImageViewHasDrawableMatcher {
+object MainDrawableMatcher {
 
     fun withDrawable(@DrawableRes id: Int) = object : TypeSafeMatcher<View>() {
 
