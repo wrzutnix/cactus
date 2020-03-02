@@ -54,6 +54,7 @@ class MainActivity: AppCompatActivity(), MainContract.View {
         picture_background.setBackgroundColor(ContextCompat.getColor(this, android.R.color.black))
         picture_progress.visibility = View.VISIBLE
         image.setImageURI(pictureUri)
+        image.tag = pictureUri
         image.alpha = 0.5f
     }
 

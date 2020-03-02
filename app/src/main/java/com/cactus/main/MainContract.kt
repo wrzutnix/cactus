@@ -1,6 +1,5 @@
 package com.cactus.main
 
-import android.app.Activity
 import android.net.Uri
 import com.cactus.ml.MLRating
 

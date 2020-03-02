@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class MainPresenter @Inject constructor(private val view: MainContract.View, private val domain: Domain): MainContract.Presenter {
 
-    private val latestPictureUriSubject: BehaviorSubject<Uri> = BehaviorSubject.create()
+    val latestPictureUriSubject: BehaviorSubject<Uri> = BehaviorSubject.create()
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray) = when {
